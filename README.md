@@ -1,4 +1,4 @@
-# hello_world
+# Groceries Store App
 
 A new Flutter project.
 
