@@ -1,4 +1,7 @@
 import "package:flutter/material.dart";
+import "package:hello_world/login_ui.dart";
+import "package:hello_world/signup_ui.dart";
+import "package:flutter/gestures.dart";
 
 void main() {
   runApp(MyApp());
@@ -10,7 +13,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //return const Placeholder();
-    return new MaterialApp(home: ProductDetail());
+    return new MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: ProductDetail(),
+    );
   }
 }
 
@@ -22,6 +28,59 @@ class ProductDetail extends StatefulWidget {
 }
 
 class _ProductDetailState extends State<ProductDetail> {
+  int _counter = 1;
+  int max_count = 5;
+
+  bool _heartChangeColor = false;
+
+  void onHeartChangeColorClicked() {
+    setState(() {
+      _heartChangeColor = !_heartChangeColor;
+    });
+  }
+
+  void onAddToBasketClicked() {
+    setState(() {
+      print("Added to the basket.");
+    });
+  }
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  void _decrementCounter() {
+    setState(() {
+      _counter--;
+    });
+  }
+
+  // Widget _quantitySelector() {
+  //   return Container(
+  //     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+  //     decoration: BoxDecoration(
+  //       border: Border.all(color: Colors.grey),
+  //       borderRadius: BorderRadius.circular(15),
+  //     ),
+  //     child: Row(
+  //       children: <Widget>[
+  //         FloatingActionButton(
+  //           onPressed: _incrementCounter,
+  //           tooltip: "Increment",
+  //           child: const Icon(Icons.add),
+  //         ),
+  //         FloatingActionButton(
+  //           onPressed: _decrementCounter,
+  //           tooltip: "Decrement",
+  //           child: const Icon(Icons.remove),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     //return const Placeholder();
@@ -42,14 +101,24 @@ class _ProductDetailState extends State<ProductDetail> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Image.asset("assets/images/left_arrow.png"),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LoginPage(),
+                                ),
+                              );
+                            },
+                            child: Image.asset("assets/images/left_arrow.png"),
+                          ),
                           Image.asset("assets/images/download_button.png"),
                         ],
                       ),
                     ),
                     const SizedBox(height: 20),
                     Container(child: Image.asset("assets/images/apple2.png")),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -75,37 +144,92 @@ class _ProductDetailState extends State<ProductDetail> {
                         "Natural Red Apple",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 25,
                           color: Colors.black,
                         ),
                       ),
-                      Image.asset("assets/images/heart"),
+                      GestureDetector(
+                        onTap: onHeartChangeColorClicked,
+                        child: Image.asset(
+                          _heartChangeColor
+                              ? "assets/images/grey_heart.png"
+                              : "assets/images/red_heart.png",
+                          width: 30,
+                        ),
+                      ),
+                      //Image.asset("assets/images/heart.png"),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
+                  Container(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      "1kg, Price",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color(0xff888888),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text(
-                        "1kg, Price",
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Color(0xff888888),
+                      IconButton(
+                        onPressed: _counter > 1 ? _decrementCounter : null,
+                        icon: Icon(
+                          Icons.remove,
+                          color: _counter > 1 ? Color(0xff53B175) : Colors.grey,
                         ),
                       ),
-                      Text(
-                        "4.99",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Colors.black,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
                         ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Text(
+                          _counter.toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: _counter < max_count
+                            ? _incrementCounter
+                            : null,
+                        icon: Icon(
+                          Icons.add,
+                          color: _counter < max_count
+                              ? Color(0xff53B175)
+                              : Color(0xff888888),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          Text(
+                            "\$4.99",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   Image.asset("assets/images/line.png"),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -113,16 +237,20 @@ class _ProductDetailState extends State<ProductDetail> {
                         "Product Detail",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 16,
                           color: Colors.black,
                         ),
                       ),
-                      Image.asset("assets/images/right_arrow.png"),
+                      Image.asset("assets/images/down_arrow.png"),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  Text(
+                    "Apples Are Nutritious. Apples May Be Good For Weight Loss. Apples May Be Good For Your Heart. As Part Of A Healthful And Varied Diet.",
+                    style: TextStyle(fontSize: 13, color: Color(0xff888888)),
+                  ),
+                  const SizedBox(height: 15),
                   Image.asset("assets/images/line.png"),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -130,16 +258,20 @@ class _ProductDetailState extends State<ProductDetail> {
                         "Nutritions",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 16,
                           color: Colors.black,
                         ),
                       ),
-                      Image.asset("assets/images/right_arrow.png"),
+                      Row(
+                        children: [
+                          Image.asset("assets/images/right_arrow.png"),
+                        ],
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   Image.asset("assets/images/line.png"),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -147,28 +279,37 @@ class _ProductDetailState extends State<ProductDetail> {
                         "Review",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 16,
                           color: Colors.black,
                         ),
                       ),
-                      Image.asset("assets/images/right_arrow.png"),
+                      Row(
+                        children: <Widget>[
+                          Image.asset("assets/images/star.png"),
+                          const SizedBox(width: 10),
+                          Image.asset("assets/images/right_arrow.png"),
+                        ],
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   Image.asset("assets/images/line.png"),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
-                height: 56,
+                height: 67,
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: onAddToBasketClicked,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                   child: Text(
                     "Add to Basket",
@@ -183,45 +324,6 @@ class _ProductDetailState extends State<ProductDetail> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  int _counter = 0;
-  void onAddToBasketClicked() {}
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  void _decrementCounter() {
-    setState(() {
-      _counter--;
-    });
-  }
-
-  Widget _quantitySelector() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        children: <Widget>[
-          FloatingActionButton(
-            onPressed: _incrementCounter,
-            tooltip: "Increment",
-            child: const Icon(Icons.add),
-          ),
-          FloatingActionButton(
-            onPressed: _decrementCounter,
-            tooltip: "Decrement",
-            child: const Icon(Icons.remove),
-          ),
-        ],
       ),
     );
   }
