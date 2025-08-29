@@ -22,6 +22,8 @@ class MyView extends StatefulWidget {
 }
 
 class _MyViewState extends State<MyView> {
+  bool isGrid = true;
+
   List<String> items = [
     "Anna",
     "Brandon",
@@ -32,17 +34,27 @@ class _MyViewState extends State<MyView> {
     "Zahara",
     "Yasmin",
   ];
+
   @override
   Widget build(BuildContext context) {
     //return const Placeholder();
     return Scaffold(
-      appBar: AppBar(title: Text("Test Grid View"), centerTitle: true),
-      body: buildList(),
+      appBar: AppBar(
+        title: Text("Test Grid View"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(isGrid ? Icons.list : Icons.grid_view),
+            onPressed: onViewClicked,
+          ),
+        ],
+      ),
+      body: isGrid ? buildGridView() : buildListView(),
     );
   }
 
   // @override
-  Widget buildList() {
+  Widget buildListView() {
     return ListView.builder(
       itemCount: items.length,
       // callback func => build each child Widget of list at corresponding idx
@@ -61,6 +73,49 @@ class _MyViewState extends State<MyView> {
         );
       },
     );
+  }
+
+  Widget buildGridView() {
+    return isGrid
+        ? GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              // column want to display
+              crossAxisCount: 2,
+            ),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return GridTile(
+                // tap on the item => InkWell
+                child: InkWell(
+                  child: Ink.image(
+                    image: AssetImage("assets/images/apple2.png"),
+                    fit: BoxFit.cover,
+                  ),
+                  onTap: () => itemSelection(item),
+                ),
+                footer: Container(
+                  padding: const EdgeInsets.all(12),
+                  alignment: Alignment.center,
+                  child: Text(
+                    item,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              );
+            },
+          )
+        : const Center(child: Text("GridView is disabled"));
+  }
+
+  void onViewClicked() {
+    setState(() {
+      isGrid = !isGrid;
+    });
   }
 
   void itemSelection(String item) {
