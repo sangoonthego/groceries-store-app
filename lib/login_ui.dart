@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:hello_world/product_detail.dart';
+import "package:flutter/material.dart";
+import "package:flutter/gestures.dart";
+import "package:hello_world/product_detail.dart";
+import "package:hello_world/signup_ui.dart";
 
 void main() {
   runApp(MyApp());
@@ -11,7 +13,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //return const Placeholder();
-    return new MaterialApp(home: LoginPage());
+    return new MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: LoginPage(),
+    );
   }
 }
 
@@ -24,164 +29,179 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _showPass = false;
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passController = TextEditingController();
 
-  TextEditingController _userController = new TextEditingController();
-  TextEditingController _passController = new TextEditingController();
+  var _emailError = "Email is invalid";
+  var _passError = "Password must at least 6 chars, and has Upper and Num";
 
-  var _userError = "User is invalid!!!";
-  var _passError = "Password must at least 6 chars";
-  var _userInValid = false;
-  var _passInValid = false;
+  var _emailInvalid = false;
+  var _passInvalid = false;
 
   @override
   Widget build(BuildContext context) {
-    //return const Placeholder();
+    // return const Placeholder();
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
-        constraints: BoxConstraints.expand(),
-        color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 20, 0, 40),
-              child: Container(
-                height: 80,
-                width: 80,
-                child: Image.asset("assets/images/carrot.png"),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
-              child: Container(
-                alignment: AlignmentDirectional.topStart,
-                child: Text(
-                  "Login",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 30,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
-              child: Container(
-                alignment: AlignmentDirectional.topStart,
-                child: Text(
-                  "Enter your emails and password",
-                  style: TextStyle(fontSize: 15, color: Color(0xff888888)),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
-              child: TextField(
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.black,
-                ),
-                controller: _userController,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  errorText: _userInValid ? _userError : null,
-                  labelStyle: TextStyle(fontSize: 18, color: Color(0xff888888)),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 30),
-              child: Stack(
-                alignment: AlignmentDirectional.centerEnd,
-                children: <Widget>[
-                  TextField(
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
-                    obscureText: !_showPass,
-                    controller: _passController,
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                      errorText: _passInValid ? _passError : null,
-                      labelStyle: TextStyle(
-                        fontSize: 18,
-                        color: Color(0xff888888),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: onToggleShowPass,
-                    child: Text(
-                      _showPass ? "HIDE" : "SHOW",
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              const SizedBox(height: 40),
+              Image.asset("assets/images/carrot.png", height: 80, width: 80),
+              const SizedBox(height: 30),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Log In",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                        color: Colors.blue,
+                        fontSize: 26,
+                        color: Colors.black,
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 8),
+                    Text(
+                      "Enter your emails and password",
+                      style: TextStyle(fontSize: 16, color: Color(0xff888888)),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-              child: Container(
-                alignment: AlignmentDirectional.topEnd,
+              const SizedBox(height: 40),
+              _buildTextField(
+                controller: _emailController,
+                labelText: "Email",
+                errorText: _emailInvalid ? _emailError : null,
+              ),
+              _buildTextField(
+                controller: _passController,
+                labelText: "Password",
+                errorText: _passInvalid ? _passError : null,
+                obscureText: !_showPass,
+                // suffixIcon: GestureDetector(
+                //   onTap: onToggleClicked,
+                //   child: Image.asset(
+                //     _showPass
+                //         ? "assets/images/show.png"
+                //         : "assets/images/hide.png",
+                //     width: 10,
+                //   ),
+                // ),
+                suffixIcon: IconButton(
+                  onPressed: onToggleClicked,
+                  icon: Icon(
+                    _showPass ? Icons.visibility : Icons.visibility_off,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                alignment: AlignmentDirectional.centerEnd,
                 child: Text(
                   "Forgot Password?",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: Color(0xff888888),
-                  ),
+                  style: TextStyle(fontSize: 16, color: Color(0xff888888)),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
-              child: Container(
-                height: 56,
+              const SizedBox(height: 20),
+              SizedBox(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                height: 67,
                 child: ElevatedButton(
                   onPressed: onLogInClicked,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: !_emailInvalid && !_passInvalid
+                        ? Color(0xff53B175)
+                        : Color(0xff888888),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 0,
                   ),
-                  child: Text(
-                    "Log in",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  child: const Text(
+                    "Log In",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Container(
-              height: 130,
-              width: double.infinity,
-              alignment: AlignmentDirectional.topCenter,
-              child: Text(
-                "Don't have an account? Sign up",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+              const SizedBox(height: 24),
+              RichText(
+                text: TextSpan(
+                  text: "Don't have an account? ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: "Sign up",
+                      style: const TextStyle(color: Color(0xff53B175)),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SignUpPage(),
+                            ),
+                          );
+                        },
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void onToggleShowPass() {
+  Widget _buildTextField({
+    TextEditingController? controller,
+    String? labelText,
+    String? errorText,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 18.0),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        style: const TextStyle(
+          // fontWeight: FontWeight.bold,
+          fontSize: 18,
+          color: Color(0xff888888),
+        ),
+        decoration: InputDecoration(
+          labelText: labelText,
+          errorText: errorText,
+          labelStyle: const TextStyle(fontSize: 16, color: Colors.black),
+          suffixIcon: suffixIcon,
+        ),
+      ),
+    );
+  }
+
+  // void onChangeColorLogInButton () {
+  //   setState(() {
+  //     if (!_emailInvalid && !_passInvalid) {
+
+  //     }
+  //   });
+  // }
+
+  void onToggleClicked() {
     setState(() {
       _showPass = !_showPass;
     });
@@ -189,29 +209,36 @@ class _LoginPageState extends State<LoginPage> {
 
   void onLogInClicked() {
     setState(() {
-      if (_userController.text.length < 6 ||
-          !_userController.text.contains("@")) {
-        _userInValid = true;
+      if (_emailController.text.length < 6 &&
+          !_emailController.text.contains("@")) {
+        _emailInvalid = true;
       } else {
-        _userInValid = false;
+        _emailInvalid = false;
       }
 
-      if (_passController.text.length < 6) {
-        _passInValid = true;
+      if (_passController.text.length < 6 ||
+          !_passController.text.contains(RegExp(r'[A-Z]')) ||
+          !_passController.text.contains(RegExp(r'[0-9]'))) {
+        _passInvalid = true;
       } else {
-        _passInValid = false;
+        _passInvalid = false;
       }
+      // _emailError =
+      //     _emailController.text.length < 6 &&
+      //         !_emailController.text.contains("@")
+      //     ? "Email is invalid"
+      //     : null;
 
-      if (!_userInValid && !_passInValid) {
+      // _passError = _passController.text.length < 6
+      //     ? "Password is at least 6 chars"
+      //     : null;
+
+      if (!_emailInvalid && !_passInvalid) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ProductDetail()),
         );
       }
     });
-  }
-
-  Widget gotoProductDetail(BuildContext context) {
-    return ProductDetail();
   }
 }

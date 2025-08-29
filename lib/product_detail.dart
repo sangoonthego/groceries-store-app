@@ -1,7 +1,5 @@
 import "package:flutter/material.dart";
 import "package:hello_world/login_ui.dart";
-import "package:hello_world/signup_ui.dart";
-import "package:flutter/gestures.dart";
 
 void main() {
   runApp(MyApp());
@@ -29,6 +27,7 @@ class ProductDetail extends StatefulWidget {
 
 class _ProductDetailState extends State<ProductDetail> {
   int _counter = 1;
+  double apple_price = 4.99;
   int max_count = 5;
 
   bool _heartChangeColor = false;
@@ -41,7 +40,7 @@ class _ProductDetailState extends State<ProductDetail> {
 
   void onAddToBasketClicked() {
     setState(() {
-      print("Added to the basket.");
+      print("Added $_counter to the basket.");
     });
   }
 
@@ -88,7 +87,7 @@ class _ProductDetailState extends State<ProductDetail> {
       body: Container(
         color: Colors.white,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Stack(
               alignment: AlignmentDirectional.center,
@@ -151,7 +150,7 @@ class _ProductDetailState extends State<ProductDetail> {
                       GestureDetector(
                         onTap: onHeartChangeColorClicked,
                         child: Image.asset(
-                          _heartChangeColor
+                          !_heartChangeColor
                               ? "assets/images/grey_heart.png"
                               : "assets/images/red_heart.png",
                           width: 30,
@@ -174,53 +173,82 @@ class _ProductDetailState extends State<ProductDetail> {
                   ),
                   const SizedBox(height: 5),
                   Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      IconButton(
-                        onPressed: _counter > 1 ? _decrementCounter : null,
-                        icon: Icon(
-                          Icons.remove,
-                          color: _counter > 1 ? Color(0xff53B175) : Colors.grey,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Text(
-                          _counter.toString(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: _counter < max_count
-                            ? _incrementCounter
-                            : null,
-                        icon: Icon(
-                          Icons.add,
-                          color: _counter < max_count
-                              ? Color(0xff53B175)
-                              : Color(0xff888888),
-                        ),
-                      ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          Text(
-                            "\$4.99",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Colors.black,
+                          IconButton(
+                            onPressed: _counter > 1 ? _decrementCounter : null,
+                            icon: Icon(
+                              Icons.remove,
+                              color: _counter > 1
+                                  ? Color(0xff53B175)
+                                  : Colors.grey,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Text(
+                              "$_counter",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: _counter < max_count
+                                ? _incrementCounter
+                                : null,
+                            icon: Icon(
+                              Icons.add,
+                              color: _counter < max_count
+                                  ? Color(0xff53B175)
+                                  : Color(0xff888888),
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.end,
+                      //   children: <Widget>[
+                      //     Text(
+                      //       "\$4.99",
+                      //       style: TextStyle(
+                      //         fontWeight: FontWeight.bold,
+                      //         fontSize: 16,
+                      //         color: Colors.black,
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      Row(
+                        // mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 10,
+                            ),
+                            // decoration: BoxDecoration(
+                            //   border: Border.all(color: Color(0xff888888)),
+                            //   borderRadius: BorderRadius.circular(15),
+                            // ),
+                            child: Text(
+                              "\$${(apple_price * _counter).toStringAsFixed(2)}",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 24,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ],
