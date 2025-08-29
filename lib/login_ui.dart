@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:flutter/gestures.dart";
-import "package:hello_world/product_detail.dart";
-import "package:hello_world/signup_ui.dart";
+import "package:groceries_store_app/product_detail.dart";
+import "package:groceries_store_app/signup_ui.dart";
 
 void main() {
   runApp(MyApp());

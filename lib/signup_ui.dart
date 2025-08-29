@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hello_world/login_ui.dart';
+import 'package:groceries_store_app/login_ui.dart';
 import "package:flutter/gestures.dart";
 
 void main() {

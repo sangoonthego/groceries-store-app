@@ -6,13 +6,13 @@
     "configurations": [
     
         {
-            "name": "hello_world (may ao)",
+            "name": "groceries_store_app (may ao)",
             "request": "launch",
             "type": "dart",
             "deviceId": "emulator-5554"
         },
         {
-            "name": "hello_world (may that)",
+            "name": "groceries_store_app (may that)",
             "request": "launch",
             "type": "dart",
             "deviceId": "v4mrovrstg8xy9m7"
