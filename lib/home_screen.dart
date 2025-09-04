@@ -50,8 +50,6 @@ class BeanProduct {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-
   final List<Product> fruits = [
     Product(
       name: "Organic Bananas",
@@ -367,6 +365,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  int _selectedIndex = 0;
 
   void _onShopClicked() {
     setState(() {
