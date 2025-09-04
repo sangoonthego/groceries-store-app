@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:groceries_store_app/home_screen.dart";
 import "package:groceries_store_app/login_ui.dart";
 
 void main() {
@@ -105,7 +106,7 @@ class _ProductDetailState extends State<ProductDetail> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => LoginPage(),
+                                  builder: (context) => HomeScreen(),
                                 ),
                               );
                             },
