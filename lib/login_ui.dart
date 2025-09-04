@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter/gestures.dart";
+import "package:groceries_store_app/home_screen.dart";
 import "package:groceries_store_app/product_detail.dart";
 import "package:groceries_store_app/signup_ui.dart";
 
@@ -236,7 +237,7 @@ class _LoginPageState extends State<LoginPage> {
       if (!_emailInvalid && !_passInvalid) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ProductDetail()),
+          MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       }
     });
