@@ -1,6 +1,5 @@
 import "package:flutter/material.dart";
 import "package:groceries_store_app/home_screen.dart";
-import "package:groceries_store_app/login_ui.dart";
 
 void main() {
   runApp(MyApp());

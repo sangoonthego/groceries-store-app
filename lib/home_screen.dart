@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import "package:groceries_store_app/explore_ui.dart";
 import "package:groceries_store_app/login_ui.dart";
 import "package:groceries_store_app/product_detail.dart";
+import "package:groceries_store_app/profile_ui.dart";
 
 void main() {
   runApp(MyApp());
@@ -333,21 +335,82 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedItemColor: Color(0xff53b175),
         unselectedItemColor: Colors.black,
         onTap: _onItemBarClicked,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.shop), label: "Shop"),
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Explore"),
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            icon: IconButton(onPressed: _onShopClicked, icon: Icon(Icons.shop)),
+            label: "Shop",
+          ),
+          BottomNavigationBarItem(
+            icon: IconButton(
+              onPressed: _onExplorelicked,
+              icon: Icon(Icons.explore),
+            ),
+            label: "Explore",
+          ),
+          BottomNavigationBarItem(
+            icon: IconButton(onPressed: null, icon: Icon(Icons.shopping_cart)),
             label: "Cart",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
+            icon: IconButton(onPressed: null, icon: Icon(Icons.favorite)),
             label: "Favourite",
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Account"),
+          BottomNavigationBarItem(
+            // icon: Icon(Icons.person),
+            icon: IconButton(
+              onPressed: _onAccountClicked,
+              icon: Icon(Icons.person),
+            ),
+            label: "Account",
+          ),
         ],
       ),
     );
+  }
+
+  void _onShopClicked() {
+    setState(() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+    });
+  }
+
+  void _onExplorelicked() {
+    setState(() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ExploreScreen()),
+      );
+    });
+  }
+
+  // void _onCartClicked() {
+  //   setState(() {
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => ProfileScreen()),
+  //     );
+  //   });
+  // }
+
+  // void _onFavouriteClicked() {
+  //   setState(() {
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => ProfileScreen()),
+  //     );
+  //   });
+  // }
+
+  void _onAccountClicked() {
+    setState(() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ProfileScreen()),
+      );
+    });
   }
 
   void _onItemBarClicked(int index) {
