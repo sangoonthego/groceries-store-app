@@ -473,7 +473,9 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () => {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ProductDetail()),
+                  MaterialPageRoute(
+                    builder: (context) => ProductDetailScreen(),
+                  ),
                 ),
               },
               child: Center(

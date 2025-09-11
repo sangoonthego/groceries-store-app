@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:groceries_store_app/signup/signup_ui.dart";
+import "package:groceries_store_app/product_detail/product_detail.dart";
 
 void main() {
   runApp(MyApp());
@@ -10,7 +10,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //return const Placeholder();
-    return MaterialApp(debugShowCheckedModeBanner: false, home: SignUpPage());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: ProductDetailScreen(),
+    );
   }
 }

@@ -145,10 +145,7 @@ class SignUpPage extends StatelessWidget {
                                   onPressed: cubit.signup,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
-                                        !state.firstNameInvalid &&
-                                            !state.lastNameInvalid &&
-                                            !state.userNameInvalid &&
-                                            !state.emailInvalid &&
+                                        !state.emailInvalid &&
                                             !state.passwordInvalid
                                         ? Color(0xff53B175)
                                         : Color(0xff888888),
@@ -224,6 +221,7 @@ class SignUpPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: TextField(
         obscureText: obscureText,
+        onChanged: onChanged,
         style: const TextStyle(
           // fontWeight: FontWeight.bold,
           fontSize: 18,
