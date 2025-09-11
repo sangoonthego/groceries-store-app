@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
-import "package:groceries_store_app/login_ui.dart";
-import "package:groceries_store_app/home_screen.dart";
-import "package:groceries_store_app/explore_ui.dart";
+import "package:groceries_store_app/login/login_ui.dart";
+import "package:groceries_store_app/home/home_screen.dart";
+import "package:groceries_store_app/explore/explore_ui.dart";
 
 void main() {
   runApp(MyApp());
@@ -108,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ListTile(
                 leading: CircleAvatar(
                   radius: 30,
-                  backgroundImage: AssetImage("assets/images/apple2.png"),
+                  backgroundImage: AssetImage("assets/images/hamster.png"),
                 ),
                 title: Row(
                   children: <Widget>[

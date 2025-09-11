@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import "package:groceries_store_app/explore_ui.dart";
-import "package:groceries_store_app/login_ui.dart";
-import "package:groceries_store_app/product_detail.dart";
-import "package:groceries_store_app/profile_ui.dart";
+import "package:groceries_store_app/explore/explore_ui.dart";
+import "package:groceries_store_app/login/login_ui.dart";
+import "package:groceries_store_app/product_detail/product_detail.dart";
+import "package:groceries_store_app/profile/profile_ui.dart";
 
 void main() {
   runApp(MyApp());

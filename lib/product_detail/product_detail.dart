@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:groceries_store_app/home_screen.dart";
+import "package:groceries_store_app/home/home_screen.dart";
 
 void main() {
   runApp(MyApp());
@@ -19,7 +19,8 @@ class MyApp extends StatelessWidget {
 }
 
 class ProductDetail extends StatefulWidget {
-  const ProductDetail({super.key});
+  //const ProductDetail({super.key});
+  const ProductDetail({Key? key}) : super(key: key);
 
   @override
   State<ProductDetail> createState() => _ProductDetailState();
