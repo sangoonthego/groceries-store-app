@@ -77,7 +77,7 @@ class ProductDetailScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text(
-                              "Natural Red Apple",
+                              state.name,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 25,
@@ -135,7 +135,7 @@ class ProductDetailScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                   child: Text(
-                                    "$state.quantity",
+                                    "${state.quantity}",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
