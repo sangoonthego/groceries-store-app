@@ -197,7 +197,7 @@ class ProductDetailScreen extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          "Apples Are Nutritious. Apples May Be Good For Weight Loss. Apples May Be Good For Your Heart. As Part Of A Healthful And Varied Diet.",
+                          state.detail,
                           style: TextStyle(
                             fontSize: 13,
                             color: Color(0xff888888),

@@ -77,7 +77,7 @@ class ProfileScreen extends StatelessWidget {
                           height: 67,
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: cubit.logout,
+                            onPressed: () => _showLogOutDialog(context, cubit),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color(0xff53b175),
                               shape: RoundedRectangleBorder(
@@ -98,6 +98,11 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (state.isLoading)
+                  Container(
+                    color: Colors.white.withValues(),
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
               ],
             ),
             bottomNavigationBar: BottomNavigationBar(
@@ -106,7 +111,7 @@ class ProfileScreen extends StatelessWidget {
               selectedItemColor: Color(0xff53b175),
               unselectedItemColor: Colors.black,
               onTap: (index) {
-                cubit.selectItem(index);
+                cubit.selectedItem(index);
                 switch (index) {
                   case 0:
                     Navigator.push(
@@ -125,6 +130,11 @@ class ProfileScreen extends StatelessWidget {
                   //   break;
                   // case 3:
                   case 4:
+                    if (state.isLoading)
+                      Container(
+                        color: Colors.white.withValues(),
+                        child: const Center(child: CircularProgressIndicator()),
+                      );
                     break;
                 }
               },
@@ -132,7 +142,6 @@ class ProfileScreen extends StatelessWidget {
                 BottomNavigationBarItem(icon: Icon(Icons.shop), label: "Shop"),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.explore),
-
                   label: "Explore",
                 ),
                 BottomNavigationBarItem(
@@ -146,7 +155,6 @@ class ProfileScreen extends StatelessWidget {
                 BottomNavigationBarItem(
                   // icon: Icon(Icons.person),
                   icon: Icon(Icons.person),
-
                   label: "Account",
                 ),
               ],
@@ -175,6 +183,42 @@ class ProfileScreen extends StatelessWidget {
         ),
         Divider(height: 10, color: Color(0xff888888)),
       ],
+    );
+  }
+
+  Future _showLogOutDialog(BuildContext context, ProfileCubit cubit) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Icon(Icons.help_outline),
+          content: Text("Are you want to logout?", textAlign: TextAlign.center),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                TextButton(
+                  child: Text("NO"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text("YES"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    cubit.logout();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

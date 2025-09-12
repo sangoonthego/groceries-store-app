@@ -21,49 +21,6 @@ class ProfileState extends Equatable {
   final bool isLoading;
   final bool isLogOutSuccess;
 
-  List<ProfileFunction> infor = [
-    ProfileFunction(
-      image: "assets/images/order.png",
-      text: "Orders",
-      arrow: "assets/images/right_arrow.png",
-    ),
-    ProfileFunction(
-      image: "assets/images/my_detail.png",
-      text: "My Details",
-      arrow: "assets/images/right_arrow.png",
-    ),
-    ProfileFunction(
-      image: "assets/images/address.png",
-      text: "Delivery Address",
-      arrow: "assets/images/right_arrow.png",
-    ),
-    ProfileFunction(
-      image: "assets/images/payment.png",
-      text: "Payment Methods",
-      arrow: "assets/images/right_arrow.png",
-    ),
-    ProfileFunction(
-      image: "assets/images/promo.png",
-      text: "Promo Cord",
-      arrow: "assets/images/right_arrow.png",
-    ),
-    ProfileFunction(
-      image: "assets/images/bell.png",
-      text: "Notifications",
-      arrow: "assets/images/right_arrow.png",
-    ),
-    ProfileFunction(
-      image: "assets/images/help.png",
-      text: "Help",
-      arrow: "assets/images/right_arrow.png",
-    ),
-    ProfileFunction(
-      image: "assets/images/about.png",
-      text: "About",
-      arrow: "assets/images/right_arrow.png",
-    ),
-  ];
-
   ProfileState({
     required this.name,
     required this.email,
@@ -71,7 +28,7 @@ class ProfileState extends Equatable {
     required this.infors,
     this.selectedIndex = 4,
     this.isLoading = false,
-    this.isLogOutSuccess = true,
+    this.isLogOutSuccess = false,
   });
 
   ProfileState copyWith({

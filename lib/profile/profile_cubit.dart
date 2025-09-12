@@ -53,14 +53,14 @@ class ProfileCubit extends Cubit<ProfileState> {
         ),
       );
 
-  void selectItem(int index) {
+  void selectedItem(int index) {
     emit(state.copyWith(selectedIndex: index));
   }
 
   void logout() {
+    emit(state.copyWith(isLoading: true));
     Future.delayed(const Duration(seconds: 2), () {
-      emit(state.copyWith(isLoading: false));
-      emit(state.copyWith(isLogOutSuccess: true));
+      emit(state.copyWith(isLoading: false, isLogOutSuccess: true));
     });
   }
 }
