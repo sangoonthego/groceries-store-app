@@ -1,27 +1,76 @@
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
-import "package:groceries_store_app/home/home_screen.dart";
-import "package:groceries_store_app/product_detail/product_state.dart";
-import "package:groceries_store_app/product_detail/product_cubit.dart";
+import "package:groceries_store_app/home/view/home_screen.dart";
+import "package:groceries_store_app/product_detail/cubit/product_state.dart";
+import "package:groceries_store_app/product_detail/cubit/product_cubit.dart";
 
 class ProductDetailScreen extends StatelessWidget {
   const ProductDetailScreen({super.key});
 
+  // Helper method để hiển thị snackbar
+  void _showSnackBar(
+    BuildContext context,
+    String message, {
+    Color color = Colors.green,
+  }) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
+  }
+
   @override
   Widget build(BuildContext context) {
-    //return const Placeholder();
     return BlocProvider(
       create: (_) => ProductCubit(),
-      child: BlocConsumer<ProductCubit, ProductState>(
-        listener: (context, state) {},
+      // Sử dụng ProductDetailState base class
+      child: BlocConsumer<ProductCubit, ProductDetailState>(
+        listener: (context, state) {
+          // Xử lý thông báo thành công
+          if (state is ProductAddedToBasketSuccess) {
+            _showSnackBar(
+              context,
+              "${state.productName} added to basket successfully!",
+              color: const Color(0xff53B175),
+            );
+          }
+          // Xử lý thông báo lỗi
+          else if (state is ProductFailureState) {
+            _showSnackBar(
+              context,
+              "Error: ${state.productError}",
+              color: Colors.red,
+            );
+          }
+        },
         builder: (context, state) {
           final cubit = context.read<ProductCubit>();
+
+          // Dữ liệu UI phải được lấy từ ProductReadyState
+          final ProductReadyState? readyState = state is ProductReadyState
+              ? state
+              : (cubit.state is ProductReadyState
+                    ? cubit.state as ProductReadyState
+                    : null);
+
+          // Kiểm tra trạng thái loading để hiển thị spinner
+          final bool isLoading = state is ProductLoadingState;
+
+          // Nếu không có dữ liệu sẵn sàng (chỉ xảy ra ở trạng thái lỗi nghiêm trọng/khởi tạo),
+          // ta có thể hiển thị một spinner toàn màn hình hoặc một widget lỗi.
+          if (readyState == null) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          // Sử dụng readyState cho các giá trị UI
           return Scaffold(
             body: Container(
               color: Colors.white,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
+                  // ... (Phần UI trên giữ nguyên, chỉ thay đổi state)
                   Stack(
                     alignment: AlignmentDirectional.center,
                     children: <Widget>[
@@ -35,12 +84,9 @@ class ProductDetailScreen extends StatelessWidget {
                               children: <Widget>[
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
+                                    Navigator.pop(
                                       context,
-                                      MaterialPageRoute(
-                                        builder: (context) => HomeScreen(),
-                                      ),
-                                    );
+                                    ); // Thường là pop thay vì push Home
                                   },
                                   child: Image.asset(
                                     "assets/images/left_arrow.png",
@@ -53,8 +99,9 @@ class ProductDetailScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          Container(child: Image.asset(state.image)),
+                          Container(child: Image.asset(readyState.image)),
                           const SizedBox(height: 10),
+                          // ... (Dots/Bar giữ nguyên)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
@@ -77,8 +124,8 @@ class ProductDetailScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text(
-                              state.name,
-                              style: TextStyle(
+                              readyState.name,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 25,
                                 color: Colors.black,
@@ -87,15 +134,15 @@ class ProductDetailScreen extends StatelessWidget {
                             GestureDetector(
                               onTap: cubit.toggleHeart,
                               child: Image.asset(
-                                !state.isHeart
+                                !readyState.isHeart
                                     ? "assets/images/grey_heart.png"
                                     : "assets/images/red_heart.png",
                                 width: 30,
                               ),
                             ),
-                            //Image.asset("assets/images/heart.png"),
                           ],
                         ),
+                        // ... (1kg, Price text giữ nguyên)
                         const SizedBox(height: 5),
                         Container(
                           alignment: AlignmentDirectional.centerStart,
@@ -115,13 +162,13 @@ class ProductDetailScreen extends StatelessWidget {
                             Row(
                               children: <Widget>[
                                 IconButton(
-                                  onPressed: state.quantity > 1
+                                  onPressed: readyState.quantity > 1
                                       ? cubit.decrementQuantity
                                       : null,
                                   icon: Icon(
                                     Icons.remove,
-                                    color: state.quantity > 1
-                                        ? Color(0xff53B175)
+                                    color: readyState.quantity > 1
+                                        ? const Color(0xff53B175)
                                         : Colors.grey,
                                   ),
                                 ),
@@ -135,8 +182,8 @@ class ProductDetailScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                   child: Text(
-                                    "${state.quantity}",
-                                    style: TextStyle(
+                                    "${readyState.quantity}",
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
                                       color: Colors.black,
@@ -144,31 +191,33 @@ class ProductDetailScreen extends StatelessWidget {
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: state.quantity < state.maxQuantity
+                                  onPressed:
+                                      readyState.quantity <
+                                          readyState.maxQuantity
                                       ? cubit.incrementQuantity
                                       : null,
                                   icon: Icon(
                                     Icons.add,
-                                    color: state.quantity < state.maxQuantity
-                                        ? Color(0xff53B175)
-                                        : Color(0xff888888),
+                                    color:
+                                        readyState.quantity <
+                                            readyState.maxQuantity
+                                        ? const Color(0xff53B175)
+                                        : const Color(0xff888888),
                                   ),
                                 ),
                               ],
                             ),
 
                             Row(
-                              // mainAxisAlignment: MainAxisAlignment.end,
                               children: <Widget>[
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10,
                                     vertical: 10,
                                   ),
-
                                   child: Text(
-                                    "\$${(state.price * state.quantity).toStringAsFixed(2)}",
-                                    style: TextStyle(
+                                    "\$${(readyState.price * readyState.quantity).toStringAsFixed(2)}",
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 24,
                                       color: Colors.black,
@@ -179,13 +228,14 @@ class ProductDetailScreen extends StatelessWidget {
                             ),
                           ],
                         ),
+                        // ... (Product Detail, Nutritions, Review sections giữ nguyên)
                         const SizedBox(height: 15),
                         Image.asset("assets/images/line.png"),
                         const SizedBox(height: 15),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text(
+                            const Text(
                               "Product Detail",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -197,8 +247,8 @@ class ProductDetailScreen extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          state.detail,
-                          style: TextStyle(
+                          readyState.detail,
+                          style: const TextStyle(
                             fontSize: 13,
                             color: Color(0xff888888),
                           ),
@@ -209,7 +259,7 @@ class ProductDetailScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text(
+                            const Text(
                               "Nutritions",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -230,7 +280,7 @@ class ProductDetailScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text(
+                            const Text(
                               "Review",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -253,27 +303,36 @@ class ProductDetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                  // --- ADD TO BASKET BUTTON ---
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
+                    child: SizedBox(
                       height: 67,
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: cubit.addBasket,
+                        onPressed: isLoading
+                            ? null
+                            : cubit.addBasket, // Disable button while loading
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
+                          backgroundColor: const Color(
+                            0xff53B175,
+                          ), // Màu xanh cố định
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        child: Text(
-                          "Add to Basket",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Colors.white,
-                          ),
-                        ),
+                        child: isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                "Add to Basket",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                     ),
                   ),

@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:groceries_store_app/product_detail/product_detail.dart";
+import "package:groceries_store_app/product_detail/view/product_detail.dart";
 
 void main() {
   runApp(MyApp());

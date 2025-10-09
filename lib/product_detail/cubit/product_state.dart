@@ -1,6 +1,14 @@
 import 'package:equatable/equatable.dart';
 
-class ProductState extends Equatable {
+// Abstract base class
+abstract class ProductDetailState extends Equatable {
+  const ProductDetailState();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class ProductReadyState extends ProductDetailState {
   final String name;
   final String image;
   final double price;
@@ -9,7 +17,7 @@ class ProductState extends Equatable {
   final int maxQuantity;
   final bool isHeart;
 
-  ProductState({
+  const ProductReadyState({
     required this.name,
     required this.image,
     required this.price,
@@ -19,7 +27,7 @@ class ProductState extends Equatable {
     this.isHeart = false,
   });
 
-  ProductState copyWith({
+  ProductReadyState copyWith({
     String? name,
     String? image,
     double? price,
@@ -28,7 +36,7 @@ class ProductState extends Equatable {
     int? maxQuantity,
     bool? isHeart,
   }) {
-    return ProductState(
+    return ProductReadyState(
       name: name ?? this.name,
       image: image ?? this.image,
       price: price ?? this.price,
@@ -49,4 +57,26 @@ class ProductState extends Equatable {
     maxQuantity,
     isHeart,
   ];
+}
+
+class ProductLoadingState extends ProductDetailState {
+  const ProductLoadingState();
+}
+
+class ProductAddedToBasketSuccess extends ProductDetailState {
+  final String productName;
+
+  const ProductAddedToBasketSuccess(this.productName);
+
+  @override
+  List<Object?> get props => [productName];
+}
+
+class ProductFailureState extends ProductDetailState {
+  final String productError;
+
+  const ProductFailureState(this.productError);
+
+  @override
+  List<Object?> get props => [productError];
 }
