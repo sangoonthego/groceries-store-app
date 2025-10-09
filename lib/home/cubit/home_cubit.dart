@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groceries_store_app/home/home_state.dart';
+import 'package:groceries_store_app/home/cubit/home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   final List<MainProduct> _fruits = [

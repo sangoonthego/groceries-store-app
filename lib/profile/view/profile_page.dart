@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:groceries_store_app/home/home_screen.dart";
+import "package:groceries_store_app/profile/view/profile_ui.dart";
 
 void main() {
   runApp(MyApp());
@@ -11,6 +11,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //return const Placeholder();
-    return MaterialApp(debugShowCheckedModeBanner: false, home: HomeScreen());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: ProfileScreen(),
+    );
   }
 }

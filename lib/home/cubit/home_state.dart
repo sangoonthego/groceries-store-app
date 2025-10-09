@@ -54,5 +54,13 @@ class HomeState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [selectedIndex, isLoading];
+  List<Object?> get props => [
+    selectedIndex,
+    isLoading,
+    mainProducts,
+    fruits,
+    spices,
+    beans,
+    meats,
+  ];
 }

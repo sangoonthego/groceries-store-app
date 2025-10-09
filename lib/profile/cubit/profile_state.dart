@@ -1,15 +1,18 @@
 import "package:equatable/equatable.dart";
 
-class ProfileFunction {
+class ProfileFunction extends Equatable {
   final String image;
   final String text;
   final String arrow;
 
-  ProfileFunction({
+  const ProfileFunction({
     required this.image,
     required this.text,
     required this.arrow,
   });
+
+  @override
+  List<Object?> get props => [image, text, arrow];
 }
 
 class ProfileState extends Equatable {
@@ -21,7 +24,7 @@ class ProfileState extends Equatable {
   final bool isLoading;
   final bool isLogOutSuccess;
 
-  ProfileState({
+  const ProfileState({
     required this.name,
     required this.email,
     required this.image,
@@ -44,7 +47,7 @@ class ProfileState extends Equatable {
       name: name ?? this.name,
       email: email ?? this.email,
       image: image ?? this.image,
-      infors: this.infors, // Infors list is static, no need to copy
+      infors: infors ?? this.infors,
       selectedIndex: selectedIndex ?? this.selectedIndex,
       isLoading: isLoading ?? this.isLoading,
       isLogOutSuccess: isLogOutSuccess ?? this.isLogOutSuccess,
@@ -56,6 +59,7 @@ class ProfileState extends Equatable {
     name,
     email,
     image,
+    infors,
     selectedIndex,
     isLoading,
     isLogOutSuccess,

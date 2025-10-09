@@ -1,29 +1,75 @@
 import "package:flutter/material.dart";
 import "package:flutter/gestures.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
-import "package:groceries_store_app/home/home_screen.dart";
-import "package:groceries_store_app/signup/signup_ui.dart";
+import "package:groceries_store_app/home/view/home_screen.dart";
+import "package:groceries_store_app/signup/view/signup_ui.dart";
 import "../cubit/login_cubit.dart";
 import "../cubit/login_state.dart";
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
+  void _showErrorSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final TextEditingController _emailController = TextEditingController();
+    final TextEditingController _passwordController = TextEditingController();
+
     return BlocProvider(
       create: (_) => LoginCubit(),
       child: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
-          if (state.isLoginSuccess) {
-            Navigator.push(
+          if (state is LoginSuccess) {
+            Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => HomeScreen()),
+              (Route<dynamic> route) => false, // delete stack
             );
+          } else if (state is LoginFailure) {
+            _showErrorSnackBar(context, state.loginError);
           }
         },
         builder: (context, state) {
           final cubit = context.read<LoginCubit>();
+
+          // get data from state, available when state is LoginReady
+          // if state is Loading, Success, hay Failure -> get final data from Ready
+
+          final LoginReady? readyState = state is LoginReady
+              ? state
+              : (context.read<LoginCubit>().state is LoginReady
+                    ? context.read<LoginCubit>().state as LoginReady
+                    : null);
+
+          // check if being Loading state?
+          final bool isLoading = state is LoginLoading;
+
+          // if state is LoginReady -> update value of controller
+          if (readyState != null) {
+            if (_emailController.text != readyState.email) {
+              _emailController.text = readyState.email;
+              _emailController.selection = TextSelection.fromPosition(
+                TextPosition(offset: readyState.email.length),
+              );
+            }
+
+            if (_passwordController.text != readyState.password) {
+              _passwordController.text = readyState.password;
+              _passwordController.selection = TextSelection.fromPosition(
+                TextPosition(offset: readyState.password.length),
+              );
+            }
+          }
+
+          // show API error after LoginFailure "listener"
+          //
 
           return Scaffold(
             body: Stack(
@@ -67,23 +113,26 @@ class LoginPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 40),
                         _buildTextField(
+                          controller: _emailController,
                           labelText: "Email",
-                          errorText: state.emailInvalid
+                          // use LoginReady -> get valid
+                          errorText: readyState?.emailInvalid == true
                               ? "Email is invalid"
                               : null,
                           onChanged: cubit.onchangeEmail,
                         ),
                         _buildTextField(
+                          controller: _passwordController,
                           labelText: "Password",
-                          errorText: state.passInvalid
+                          errorText: readyState?.passInvalid == true
                               ? "Password must at least 6 chars, and has Upper and Num"
                               : null,
-                          obscureText: !state.showPassword,
+                          obscureText: !(readyState?.showPassword ?? false),
                           onChanged: cubit.onchangePassword,
                           suffixIcon: IconButton(
                             onPressed: cubit.togglePasswordVisibility,
                             icon: Icon(
-                              state.showPassword
+                              (readyState?.showPassword ?? false)
                                   ? Icons.visibility
                                   : Icons.visibility_off,
                             ),
@@ -101,7 +150,7 @@ class LoginPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        state.isLoading
+                        isLoading
                             ? const CircularProgressIndicator()
                             : SizedBox(
                                 width: double.infinity,
@@ -110,8 +159,8 @@ class LoginPage extends StatelessWidget {
                                   onPressed: cubit.login,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
-                                        !state.emailInvalid &&
-                                            !state.passInvalid
+                                        !(readyState?.emailInvalid == false &&
+                                            readyState?.passInvalid == false)
                                         ? const Color(0xff53B175)
                                         : const Color(0xff888888),
                                     shape: RoundedRectangleBorder(
@@ -163,7 +212,7 @@ class LoginPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (state.isLoading)
+                if (isLoading)
                   Container(
                     color: Colors.white.withValues(),
                     child: const Center(child: CircularProgressIndicator()),
@@ -177,15 +226,19 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget _buildTextField({
+    required TextEditingController controller,
     String? labelText,
     String? errorText,
     bool obscureText = false,
     Widget? suffixIcon,
     required Function(String) onChanged,
+    // String? initialValue, // hold data when state changed
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 18.0),
       child: TextField(
+        // controller: TextEditingController(text: initialValue),
+        controller: controller,
         obscureText: obscureText,
         onChanged: onChanged,
         style: const TextStyle(fontSize: 18, color: Color(0xff888888)),
