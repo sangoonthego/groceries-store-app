@@ -1,6 +1,6 @@
 import "package:flutter_bloc/flutter_bloc.dart";
-import "package:groceries_store_app/explore/explore_state.dart";
-import "package:groceries_store_app/home/home_screen.dart";
+import "package:groceries_store_app/explore/cubit/explore_state.dart";
+import "package:groceries_store_app/home/view/home_screen.dart";
 
 class ExploreCubit extends Cubit<ExploreState> {
   final List<Product> _products = [

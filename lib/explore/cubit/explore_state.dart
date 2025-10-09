@@ -31,5 +31,5 @@ class ExploreState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [selectedIndex, isLoading];
+  List<Object?> get props => [selectedIndex, isLoading, products];
 }

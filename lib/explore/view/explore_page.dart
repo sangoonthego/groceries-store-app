@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:groceries_store_app/explore/explore_ui.dart";
+import "package:groceries_store_app/explore/view/explore_ui.dart";
 
 void main() {
   runApp(MyApp());
