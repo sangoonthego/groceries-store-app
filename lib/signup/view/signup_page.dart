@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:groceries_store_app/signup/signup_ui.dart";
+import "package:groceries_store_app/signup/view/signup_ui.dart";
 
 void main() {
   runApp(MyApp());
