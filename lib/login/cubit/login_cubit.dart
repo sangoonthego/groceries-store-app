@@ -1,5 +1,5 @@
 import "package:flutter_bloc/flutter_bloc.dart";
-import "package:groceries_store_app/login/login_state.dart";
+import "package:groceries_store_app/login/cubit/login_state.dart";
 
 class LoginCubit extends Cubit<LoginState> {
   LoginCubit()

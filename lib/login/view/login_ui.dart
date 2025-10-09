@@ -3,8 +3,8 @@ import "package:flutter/gestures.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:groceries_store_app/home/home_screen.dart";
 import "package:groceries_store_app/signup/signup_ui.dart";
-import "login_cubit.dart";
-import "login_state.dart";
+import "../cubit/login_cubit.dart";
+import "../cubit/login_state.dart";
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
