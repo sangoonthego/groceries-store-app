@@ -3,7 +3,7 @@
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:groceries_store_app/home/view/home_screen.dart";
-import "package:groceries_store_app/profile/view/profile_ui.dart";
+import "package:groceries_store_app/product_detail/view/profile/view/profile_ui.dart";
 import "package:groceries_store_app/cart/view/cart_ui.dart";
 import "package:groceries_store_app/explore/cubit/explore_cubit.dart";
 import "package:groceries_store_app/explore/cubit/explore_state.dart";
