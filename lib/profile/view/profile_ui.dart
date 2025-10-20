@@ -6,6 +6,8 @@ import "package:groceries_store_app/explore/view/explore_ui.dart";
 import "package:groceries_store_app/cart/view/cart_ui.dart";
 import "package:groceries_store_app/profile/cubit/profile_state.dart";
 import "package:groceries_store_app/profile/cubit/profile_cubit.dart";
+import "package:groceries_store_app/profile/data/profile_request.dart";
+import "package:groceries_store_app/services/api_service.dart";
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -13,7 +15,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ProfileCubit(),
+      create: (_) => ProfileCubit(ApiService()),
       child: BlocConsumer<ProfileCubit, ProfileState>(
         listener: (context, state) {
           if (state.isLogOutSuccess) {
