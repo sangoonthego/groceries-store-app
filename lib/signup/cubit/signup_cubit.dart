@@ -1,75 +1,7 @@
-// import "package:flutter_bloc/flutter_bloc.dart";
-// import "package:groceries_store_app/signup/cubit/signup_state.dart";
-
-// class SignUpCubit extends Cubit<SignUpState> {
-//   SignUpCubit()
-//     : super(
-//         const SignUpState(
-//           firstName: "",
-//           lastName: "",
-//           userName: "",
-//           email: "",
-//           password: "",
-//           isLoading: false,
-//         ),
-//       );
-
-//   void togglePasswordVisibility() {
-//     emit(state.copyWith(showPassword: !state.showPassword));
-//   }
-
-//   void onchangeFirstName(String firstName) {
-//     emit(state.copyWith(firstName: firstName));
-//   }
-
-//   void onchangeLastName(String lastName) {
-//     emit(state.copyWith(lastName: lastName));
-//   }
-
-//   void onchangeUserName(String userName) {
-//     emit(state.copyWith(userName: userName));
-//   }
-
-//   void onchangeEmail(String email) {
-//     emit(state.copyWith(email: email));
-//   }
-
-//   void onchangePassword(String password) {
-//     emit(state.copyWith(password: password));
-//   }
-
-//   void signup() {
-//     bool emailInvalid = state.email.length < 6 || !state.email.contains("@");
-//     bool passInvalid =
-//         state.password.length < 6 ||
-//         !RegExp(r'[A-Z]').hasMatch(state.password) ||
-//         !RegExp(r'[0-9]').hasMatch(state.password);
-
-//     if (!emailInvalid && !passInvalid) {
-//       emit(
-//         state.copyWith(
-//           emailInvalid: false,
-//           passwordInvalid: false,
-//           isLoading: true,
-//         ),
-//       );
-
-//       Future.delayed(const Duration(seconds: 2), () {
-//         emit(state.copyWith(isLoading: false));
-//         emit(state.copyWith(isSignUpSuccess: true));
-//       });
-//     } else {
-//       emit(
-//         state.copyWith(
-//           emailInvalid: emailInvalid,
-//           passwordInvalid: passInvalid,
-//         ),
-//       );
-//     }
-//   }
-// }
-
+import "package:dio/dio.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
+import "package:groceries_store_app/signup/data/signup_request.dart";
+import "package:groceries_store_app/signup/data/signup_response.dart";
 import "package:groceries_store_app/signup/cubit/signup_state.dart";
 
 class SignupCubit extends Cubit<SignupState> {
@@ -85,83 +17,88 @@ class SignupCubit extends Cubit<SignupState> {
       );
 
   SignupReady get currentState => state as SignupReady;
+  final Dio dio = Dio();
 
   void togglePasswordVisibility() {
-    if (state is SignupReady) {
-      emit(currentState.copyWith(showPassword: !currentState.showPassword));
-    }
+    emit(currentState.copyWith(showPassword: !currentState.showPassword));
   }
 
-  void onchangeFirstName(String firstName) {
-    if (state is SignupReady) {
-      emit(
-        currentState.copyWith(firstName: firstName, firstNameInvalid: false),
-      );
-    }
+  void onchangeFirstName(String value) {
+    emit(currentState.copyWith(firstName: value, firstNameInvalid: false));
   }
 
-  void onchangeLastName(String lastName) {
-    if (state is SignupReady) {
-      emit(currentState.copyWith(lastName: lastName, lastNameInvalid: false));
-    }
+  void onchangeLastName(String value) {
+    emit(currentState.copyWith(lastName: value, lastNameInvalid: false));
   }
 
-  void onchangeUserName(String userName) {
-    if (state is SignupReady) {
-      emit(currentState.copyWith(userName: userName, userNameInvalid: false));
-    }
+  void onchangeUserName(String value) {
+    emit(currentState.copyWith(userName: value, userNameInvalid: false));
   }
 
-  void onchangeEmail(String email) {
-    if (state is SignupReady) {
-      emit(currentState.copyWith(email: email, emailInvalid: false));
-    }
+  void onchangeEmail(String value) {
+    emit(currentState.copyWith(email: value, emailInvalid: false));
   }
 
-  void onchangePassword(String password) {
-    if (state is SignupReady) {
-      emit(currentState.copyWith(password: password, passwordInvalid: false));
-    }
+  void onchangePassword(String value) {
+    emit(currentState.copyWith(password: value, passwordInvalid: false));
   }
 
-  void signup() async {
+  Future<void> signup() async {
     if (state is! SignupReady) return;
+    final data = currentState;
 
-    final currentData = currentState;
+    // Validate input
+    final emailInvalid = data.email.isEmpty || !data.email.contains("@");
+    final passwordInvalid = data.password.length < 6;
+    final firstNameInvalid = data.firstName.isEmpty;
+    final lastNameInvalid = data.lastName.isEmpty;
+    final userNameInvalid = data.userName.isEmpty;
 
-    bool emailInvalid =
-        currentData.email.length < 6 || !currentData.email.contains("@");
-    bool passwordInvalid =
-        currentData.password.length < 6 ||
-        !RegExp(r'[A-Z]').hasMatch(currentData.password) ||
-        !RegExp(r'[0-9]').hasMatch(currentData.password);
-
-    if (emailInvalid || passwordInvalid) {
+    if (emailInvalid ||
+        passwordInvalid ||
+        firstNameInvalid ||
+        lastNameInvalid ||
+        userNameInvalid) {
       emit(
-        currentData.copyWith(
+        data.copyWith(
           emailInvalid: emailInvalid,
           passwordInvalid: passwordInvalid,
+          firstNameInvalid: firstNameInvalid,
+          lastNameInvalid: lastNameInvalid,
+          userNameInvalid: userNameInvalid,
         ),
       );
-    } else {
-      emit(const SignupLoading());
-      await Future.delayed(const Duration(seconds: 2));
+      return;
+    }
 
-      try {
-        final bool apiSuccess = currentData.email != "testfail@gmail.com";
+    emit(const SignupLoading());
 
-        if (apiSuccess) {
-          emit(const SignupSuccess(userId: "user_12345"));
-        } else {
-          emit(
-            const SignupFailure(
-              signupError: "Email or Password is Incorrect!!!",
-            ),
-          );
-        }
-      } catch (e) {
-        emit(const SignupFailure(signupError: "Error!!! Try again!"));
+    try {
+      final request = SignupRequest(
+        firstName: data.firstName,
+        lastName: data.lastName,
+        userName: data.userName,
+        email: data.email,
+        password: data.password,
+      );
+
+      final response = await dio.post(
+        "https://us-central1-skin-scanner-3c419.cloudfunctions.net/base/v1/auth-service/register",
+        data: request.toJson(),
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final signupResponse = SignupResponse.fromJson(response.data);
+        emit(SignupSuccess(userId: signupResponse.userId ?? ""));
+      } else {
+        emit(
+          SignupFailure(
+            signupError: "Unexpected error: ${response.statusCode}",
+          ),
+        );
       }
+    } catch (e) {
+      emit(SignupFailure(signupError: e.toString()));
     }
   }
 }
