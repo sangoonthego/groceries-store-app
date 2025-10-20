@@ -1,10 +1,10 @@
 import "package:flutter/material.dart";
 import "package:flutter/gestures.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
-import "package:groceries_store_app/home/view/home_screen.dart";
 import "package:groceries_store_app/signup/view/signup_ui.dart";
 import "../cubit/login_cubit.dart";
 import "../cubit/login_state.dart";
+import "package:groceries_store_app/home/view/home_screen.dart";
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -27,6 +27,7 @@ class LoginPage extends StatelessWidget {
       child: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
           if (state is LoginSuccess) {
+            //Navigator.pushReplacementNamed(context, '/home');
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -159,7 +160,7 @@ class LoginPage extends StatelessWidget {
                                   onPressed: cubit.login,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
-                                        !(readyState?.emailInvalid == false &&
+                                        (readyState?.emailInvalid == false &&
                                             readyState?.passInvalid == false)
                                         ? const Color(0xff53B175)
                                         : const Color(0xff888888),

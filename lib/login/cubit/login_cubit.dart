@@ -1,56 +1,16 @@
-// import "package:flutter_bloc/flutter_bloc.dart";
-// import "package:groceries_store_app/login/cubit/login_state.dart";
-
-// class LoginCubit extends Cubit<LoginState> {
-//   LoginCubit()
-//     : super(const LoginState(email: "", password: "", isLoading: false));
-
-//   void togglePasswordVisibility() {
-//     emit(state.copyWith(showPassword: !state.showPassword));
-//   }
-
-//   void onchangeEmail(String email) {
-//     emit(state.copyWith(email: email));
-//   }
-
-//   void onchangePassword(String password) {
-//     emit(state.copyWith(password: password));
-//   }
-
-//   void login() {
-//     bool emailInvalid = state.email.length < 6 || !state.email.contains("@");
-//     bool passInvalid =
-//         state.password.length < 6 ||
-//         !RegExp(r'[A-Z]').hasMatch(state.password) ||
-//         !RegExp(r'[0-9]').hasMatch(state.password);
-
-//     if (!emailInvalid && !passInvalid) {
-//       emit(
-//         state.copyWith(
-//           emailInvalid: false,
-//           passInvalid: false,
-//           isLoading: true,
-//         ),
-//       );
-
-//       Future.delayed(const Duration(seconds: 2), () {
-//         emit(state.copyWith(isLoading: false));
-//         emit(state.copyWith(isLoginSuccess: true));
-//       });
-//     } else {
-//       emit(
-//         state.copyWith(emailInvalid: emailInvalid, passInvalid: passInvalid),
-//       );
-//     }
-//   }
-// }
-
+import "package:dio/dio.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:groceries_store_app/login/cubit/login_state.dart";
+import "package:groceries_store_app/services/api_service.dart";
+import "package:groceries_store_app/storage/token_storage.dart";
+import "package:groceries_store_app/login/data/login_request.dart";
+import "package:groceries_store_app/login/data/login_response.dart";
 
 class LoginCubit extends Cubit<LoginState> {
   // init state must be LoginInitial or LoginReady
   LoginCubit() : super(const LoginReady(email: "", password: ""));
+
+  //final Dio _dio = ApiService().dio;
 
   // get current data from LoginReady
   LoginReady get currentState => state as LoginReady;
@@ -74,50 +34,69 @@ class LoginCubit extends Cubit<LoginState> {
     }
   }
 
-  void login() async {
-    // check if current state is LoginReady
+  final Dio dio = Dio();
+
+  Future<void> login() async {
     if (state is! LoginReady) return;
 
     final currentData = currentState;
+    final email = currentData.email;
+    final password = currentData.password;
 
-    // data valid
-    bool emailInvalid =
-        currentData.email.length < 6 || !currentData.email.contains("@");
-    bool passInvalid =
-        currentData.password.length < 6 ||
-        !RegExp(r'[A-Z]').hasMatch(currentData.password) ||
-        !RegExp(r'[0-9]').hasMatch(currentData.password);
+    //valid input
+    final emailInvalid = email.length < 6 || !email.contains("@");
+    final passInvalid = password.length < 6;
 
     if (emailInvalid || passInvalid) {
-      // if error valid -> emit LoginReady
       emit(
         currentData.copyWith(
           emailInvalid: emailInvalid,
           passInvalid: passInvalid,
         ),
       );
-    } else {
-      // if valid success: Emit LoginLoading
-      emit(const LoginLoading());
+      return;
+    }
 
-      // call API
-      await Future.delayed(const Duration(seconds: 2));
+    //loading state
+    emit(const LoginLoading());
 
-      // API handle
-      try {
-        final bool apiSuccess = currentData.email != "testfail@gmail.com";
+    try {
+      final loginRequest = LoginRequest(email: email, password: password);
+      final response = await dio.post(
+        'https://us-central1-skin-scanner-3c419.cloudfunctions.net/base/v1/auth-service/login', //endpoint
+        data: loginRequest.toJson(),
+      );
 
-        if (apiSuccess) {
-          // success -> LoginSucess
-          emit(const LoginSuccess(userId: "user_12345"));
-        } else {
-          emit(
-            const LoginFailure(loginError: "Email or Password is Incorrect!!!"),
-          );
-        }
-      } catch (e) {
-        emit(const LoginFailure(loginError: "Error!!! Try again!"));
+      if (response.statusCode == 200) {
+        final loginResponse = LoginResponse.fromJson(response.data);
+        await TokenStorage.saveTokens(
+          loginResponse.accessToken,
+          loginResponse.refreshToken,
+        );
+
+        emit(LoginSuccess(userId: response.data["userId"] ?? ""));
       }
+      // if (response.statusCode == 200) {
+      //   final data = response.data['data'];
+      //   final user = data['user'];
+      //   final tokens = data['tokens'];
+      //   final accessToken = tokens['accessToken'] ?? '';
+      //   final refreshToken = tokens['refreshToken'] ?? '';
+      //   final userId = user['userId'] ?? '';
+      //   await TokenStorage.saveTokens(accessToken, refreshToken);
+      //   emit(LoginSuccess(userId: userId));
+      // }
+      else {
+        emit(const LoginFailure(loginError: "Incorrect Account or Password"));
+      }
+    } on DioException catch (e) {
+      String message = "Error connecting to Server";
+      if (e.response != null && e.response?.data != null) {
+        message = e.response?.data["message"] ?? message;
+      }
+      emit(LoginFailure(loginError: message));
+    } catch (e) {
+      emit(const LoginFailure(loginError: "Undefined Error"));
     }
   }
 }
