@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import "package:flutter/gestures.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import 'package:groceries_store_app/login/view/login_ui.dart';
+import "package:groceries_store_app/services/api_service.dart";
 import "package:groceries_store_app/signup/cubit/signup_cubit.dart";
 import "package:groceries_store_app/signup/cubit/signup_state.dart";
 
@@ -31,7 +32,7 @@ class SignUpPage extends StatelessWidget {
     var _passError = "Password must be at least 6 chars and has Upper and Nums";
 
     return BlocProvider(
-      create: (_) => SignupCubit(),
+      create: (_) => SignupCubit(ApiService()),
       child: BlocConsumer<SignupCubit, SignupState>(
         listener: (context, state) {
           if (state is SignupSuccess) {

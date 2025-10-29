@@ -5,10 +5,22 @@ class SignupResponse {
   SignupResponse({this.userId, this.message});
 
   factory SignupResponse.fromJson(Map<String, dynamic> json) {
-    final data = json["data"];
+    // Handle response format từ API:
+    // {
+    //   "statusCode": 201,
+    //   "message": "User created successfully and activated",
+    //   "data": [], // hoặc có thể là object chứa user info
+    //   "timestamp": "..."
+    // }
+
+    String? userId;
+    if (json["data"] is Map) {
+      userId = json["data"]["userId"]?.toString();
+    }
+
     return SignupResponse(
-      userId: data?["userId"] ?? "",
-      message: json["message"] ?? "",
+      userId: userId ?? "", // Nếu không có userId, trả về empty string
+      message: json["message"]?.toString() ?? "Unknown response",
     );
   }
 }

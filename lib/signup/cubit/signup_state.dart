@@ -26,10 +26,14 @@ class SignupReady extends SignupState {
   final bool passwordInvalid;
 
   const SignupReady({
-    required this.firstName,
-    required this.lastName,
-    required this.userName,
-    required this.email,
+    // required this.firstName,
+    // required this.lastName,
+    // required this.userName,
+    // required this.email,
+    this.firstName = "",
+    this.lastName = "",
+    this.userName = "",
+    this.email = "",
     required this.password,
     this.showPassword = false,
     this.firstNameInvalid = false,
@@ -59,6 +63,7 @@ class SignupReady extends SignupState {
       email: email ?? this.email,
       password: password ?? this.password,
       showPassword: showPassword ?? this.showPassword,
+
       firstNameInvalid: firstNameInvalid ?? this.firstNameInvalid,
       lastNameInvalid: lastNameInvalid ?? this.lastNameInvalid,
       userNameInvalid: userNameInvalid ?? this.userNameInvalid,

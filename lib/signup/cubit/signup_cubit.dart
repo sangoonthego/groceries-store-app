@@ -3,21 +3,14 @@ import "package:flutter_bloc/flutter_bloc.dart";
 import "package:groceries_store_app/signup/data/signup_request.dart";
 import "package:groceries_store_app/signup/data/signup_response.dart";
 import "package:groceries_store_app/signup/cubit/signup_state.dart";
+import "package:groceries_store_app/services/api_service.dart";
 
 class SignupCubit extends Cubit<SignupState> {
-  SignupCubit()
-    : super(
-        const SignupReady(
-          firstName: "",
-          lastName: "",
-          userName: "",
-          email: "",
-          password: "",
-        ),
-      );
+  final ApiService _apiService;
+
+  SignupCubit(this._apiService) : super(const SignupReady(password: ""));
 
   SignupReady get currentState => state as SignupReady;
-  final Dio dio = Dio();
 
   void togglePasswordVisibility() {
     emit(currentState.copyWith(showPassword: !currentState.showPassword));
@@ -45,14 +38,19 @@ class SignupCubit extends Cubit<SignupState> {
 
   Future<void> signup() async {
     if (state is! SignupReady) return;
-    final data = currentState;
+    final currentData = currentState;
+    final email = currentData.email.trim();
+    final password = currentData.password;
+    final firstName = currentData.firstName.trim();
+    final lastName = currentData.lastName.trim();
+    final userName = currentData.userName.trim();
 
     // Validate input
-    final emailInvalid = data.email.isEmpty || !data.email.contains("@");
-    final passwordInvalid = data.password.length < 6;
-    final firstNameInvalid = data.firstName.isEmpty;
-    final lastNameInvalid = data.lastName.isEmpty;
-    final userNameInvalid = data.userName.isEmpty;
+    final emailInvalid = email.isEmpty || !email.contains("@");
+    final passwordInvalid = password.length < 6;
+    final firstNameInvalid = firstName.isEmpty;
+    final lastNameInvalid = lastName.isEmpty;
+    final userNameInvalid = userName.isEmpty;
 
     if (emailInvalid ||
         passwordInvalid ||
@@ -60,7 +58,7 @@ class SignupCubit extends Cubit<SignupState> {
         lastNameInvalid ||
         userNameInvalid) {
       emit(
-        data.copyWith(
+        currentData.copyWith(
           emailInvalid: emailInvalid,
           passwordInvalid: passwordInvalid,
           firstNameInvalid: firstNameInvalid,
@@ -75,30 +73,30 @@ class SignupCubit extends Cubit<SignupState> {
 
     try {
       final request = SignupRequest(
-        firstName: data.firstName,
-        lastName: data.lastName,
-        userName: data.userName,
-        email: data.email,
-        password: data.password,
+        firstName: firstName,
+        lastName: lastName,
+        userName: userName,
+        email: email,
+        password: password,
       );
 
-      final response = await dio.post(
-        "https://us-central1-skin-scanner-3c419.cloudfunctions.net/base/v1/auth-service/register",
-        data: request.toJson(),
-      );
+      print("Register Request: ${request.toJson()}"); // DEBUG
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        final signupResponse = SignupResponse.fromJson(response.data);
-        emit(SignupSuccess(userId: signupResponse.userId ?? ""));
-      } else {
-        emit(
-          SignupFailure(
-            signupError: "Unexpected error: ${response.statusCode}",
-          ),
-        );
-      }
+      final response = await _apiService.register(request.toJson());
+      final signupResponse = SignupResponse.fromJson(response);
+
+      print("Register Success - UserId: ${signupResponse.userId}"); // DEBUG
+
+      emit(SignupSuccess(userId: signupResponse.userId ?? ""));
     } catch (e) {
-      emit(SignupFailure(signupError: e.toString()));
+      print("Register Error in Cubit: $e"); // DEBUG
+      String errorMessage = "Registration failed";
+
+      if (e is DioError && e.response?.data?["message"] != null) {
+        errorMessage = e.response!.data["message"].toString();
+      }
+
+      emit(SignupFailure(signupError: errorMessage));
     }
   }
 }

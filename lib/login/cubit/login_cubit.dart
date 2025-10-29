@@ -68,13 +68,22 @@ class LoginCubit extends Cubit<LoginState> {
       );
 
       if (response.statusCode == 200) {
-        final loginResponse = LoginResponse.fromJson(response.data);
-        await TokenStorage.saveTokens(
-          loginResponse.accessToken,
-          loginResponse.refreshToken,
-        );
+        print("Login Response: ${response.data}"); // DEBUG
 
-        emit(LoginSuccess(userId: response.data["userId"] ?? ""));
+        final data = response.data['data'];
+        final tokens = data['tokens'] ?? {};
+        final accessToken = tokens['accessToken'] ?? '';
+        final refreshToken = tokens['refreshToken'] ?? '';
+
+        print("Extracted tokens:"); // DEBUG
+        print("Access Token: $accessToken"); // DEBUG
+        print("Refresh Token: $refreshToken"); // DEBUG
+
+        await TokenStorage.saveTokens(accessToken, refreshToken);
+
+        final user = data['user'] ?? {};
+        final userId = user['userId'] ?? '';
+        emit(LoginSuccess(userId: userId));
       }
       // if (response.statusCode == 200) {
       //   final data = response.data['data'];
