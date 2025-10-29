@@ -12,12 +12,19 @@ class TokenStorage {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_accessTokenKey, accessToken);
     await prefs.setString(_refreshTokenKey, refreshToken);
+
+    // Debug log
+    print("Tokens saved:"); // DEBUG
+    print("- Access Token: $accessToken"); // DEBUG
+    print("- Refresh Token: $refreshToken"); // DEBUG
   }
 
   // get access token
   static Future<String?> getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_accessTokenKey);
+    final token = prefs.getString(_accessTokenKey);
+    print("Retrieved Access Token: $token"); // DEBUG
+    return token;
   }
 
   // get refresh token
