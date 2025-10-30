@@ -1,21 +1,15 @@
-class LoginRequest {
-  final String email;
-  final String password;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  LoginRequest({required this.email, required this.password});
+part 'login_request.freezed.dart';
+part 'login_request.g.dart';
 
-  //convert object into json to send api
-  Map<String, dynamic> toJson() {
-    return {"email": email, "password": password};
-  }
+@freezed
+class LoginRequest with _$LoginRequest {
+  const factory LoginRequest({
+    required String email,
+    required String password,
+  }) = _LoginRequest;
 
-  // LoginRequest copyWith({String? email, String? password}) {
-  //   return LoginRequest(
-  //     email: email ?? this.email,
-  //     password: password ?? this.password,
-  //   );
-  // }
-
-  // @override
-  // String toString() => 'LoginRequest(email: $email, password: $password)';
+  factory LoginRequest.fromJson(Map<String, dynamic> json) =>
+      _$LoginRequestFromJson(json);
 }

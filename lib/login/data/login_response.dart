@@ -1,34 +1,37 @@
-class LoginResponse {
-  final String accessToken;
-  final String refreshToken;
-  //final String? message;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  LoginResponse({
-    required this.accessToken,
-    required this.refreshToken,
-    //this.message,
-  });
+part 'login_response.freezed.dart';
+part 'login_response.g.dart';
 
-  // parse json data
+@freezed
+class LoginResponse with _$LoginResponse {
+  const factory LoginResponse({
+    required String accessToken,
+    required String refreshToken,
+    @Default('') String userId,
+  }) = _LoginResponse;
+
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
-    final tokens = json["data"]?["tokens"] ?? {};
+    // Log the raw response first
+    print('Raw Login Response JSON: $json');
 
-    return LoginResponse(
-      accessToken: tokens?["accessToken"] ?? '',
-      refreshToken: tokens?["refreshToken"] ?? '',
-      //message: json["message"],
-    );
+    // Check if we have data structure
+    if (json['data'] == null) {
+      throw FormatException('Response is missing data field: $json');
+    }
+
+    final data = json['data'] as Map<String, dynamic>;
+    final tokens = data['tokens'] as Map<String, dynamic>?;
+    final user = data['user'] as Map<String, dynamic>?;
+
+    if (tokens == null) {
+      throw FormatException('Response is missing tokens field: $data');
+    }
+
+    return _$LoginResponseFromJson({
+      'accessToken': tokens['accessToken'] as String? ?? '',
+      'refreshToken': tokens['refreshToken'] as String? ?? '',
+      'userId': user?['userId'] as String? ?? '',
+    });
   }
-
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     "accessToken": accessToken,
-  //     "refreshToken": refreshToken,
-  //     "message": message,
-  //   };
-  // }
-
-  // @override
-  // String toString() =>
-  //     'LoginResponse(accessToken: $accessToken, refreshToken: $refreshToken, message: $message)';
 }

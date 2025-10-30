@@ -1,111 +1,169 @@
-import "package:dio/dio.dart";
-import "package:flutter_bloc/flutter_bloc.dart";
-import "package:groceries_store_app/login/cubit/login_state.dart";
-import "package:groceries_store_app/services/api_service.dart";
-import "package:groceries_store_app/storage/token_storage.dart";
-import "package:groceries_store_app/login/data/login_request.dart";
+import 'package:dio/dio.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:groceries_store_app/login/api/login_api.dart';
 import "package:groceries_store_app/login/data/login_response.dart";
+import 'package:groceries_store_app/login/cubit/login_state.dart';
+import 'package:groceries_store_app/login/models/login_form_model.dart';
+import 'package:groceries_store_app/services/api_service.dart';
+import 'package:groceries_store_app/storage/token_storage.dart';
+import 'package:groceries_store_app/login/data/login_request.dart';
 
 class LoginCubit extends Cubit<LoginState> {
-  // init state must be LoginInitial or LoginReady
-  LoginCubit() : super(const LoginReady(email: "", password: ""));
+  LoginCubit() : super(LoginState.ready(form: const LoginFormModel()));
 
-  //final Dio _dio = ApiService().dio;
-
-  // get current data from LoginReady
-  LoginReady get currentState => state as LoginReady;
+  final _apiService = ApiService();
 
   void togglePasswordVisibility() {
-    // only work when be at LoginReady
-    if (state is LoginReady) {
-      emit(currentState.copyWith(showPassword: !currentState.showPassword));
-    }
+    state.mapOrNull(
+      ready: (ready) {
+        emit(
+          LoginState.ready(
+            form: ready.form.copyWith(showPassword: !ready.form.showPassword),
+          ),
+        );
+      },
+    );
   }
 
-  void onchangeEmail(String email) {
-    if (state is LoginReady) {
-      emit(currentState.copyWith(email: email, emailInvalid: false));
-    }
+  void onChangeEmail(String email) {
+    state.mapOrNull(
+      ready: (ready) {
+        emit(
+          LoginState.ready(
+            form: ready.form.copyWith(email: email, emailInvalid: false),
+          ),
+        );
+      },
+    );
   }
 
-  void onchangePassword(String password) {
-    if (state is LoginReady) {
-      emit(currentState.copyWith(password: password, passInvalid: false));
-    }
+  void onChangePassword(String password) {
+    state.mapOrNull(
+      ready: (ready) {
+        emit(
+          LoginState.ready(
+            form: ready.form.copyWith(password: password, passInvalid: false),
+          ),
+        );
+      },
+    );
   }
 
-  final Dio dio = Dio();
-
-  Future<void> login() async {
-    if (state is! LoginReady) return;
-
-    final currentData = currentState;
-    final email = currentData.email;
-    final password = currentData.password;
-
-    //valid input
-    final emailInvalid = email.length < 6 || !email.contains("@");
-    final passInvalid = password.length < 6;
+  bool _validateForm(LoginFormModel form) {
+    final emailInvalid = form.email.length < 6 || !form.email.contains('@');
+    final passInvalid = form.password.length < 6;
 
     if (emailInvalid || passInvalid) {
       emit(
-        currentData.copyWith(
-          emailInvalid: emailInvalid,
-          passInvalid: passInvalid,
+        LoginState.ready(
+          form: form.copyWith(
+            emailInvalid: emailInvalid,
+            passInvalid: passInvalid,
+          ),
         ),
       );
-      return;
+      return false;
     }
+    return true;
+  }
 
-    //loading state
-    emit(const LoginLoading());
+  Future<void> login() async {
+    state.mapOrNull(
+      ready: (ready) async {
+        if (!_validateForm(ready.form)) return;
 
-    try {
-      final loginRequest = LoginRequest(email: email, password: password);
-      final response = await dio.post(
-        'https://us-central1-skin-scanner-3c419.cloudfunctions.net/base/v1/auth-service/login', //endpoint
-        data: loginRequest.toJson(),
-      );
+        emit(const LoginState.loading());
 
-      if (response.statusCode == 200) {
-        print("Login Response: ${response.data}"); // DEBUG
+        try {
+          final loginRequest = LoginRequest(
+            email: ready.form.email,
+            password: ready.form.password,
+          );
 
-        final data = response.data['data'];
-        final tokens = data['tokens'] ?? {};
-        final accessToken = tokens['accessToken'] ?? '';
-        final refreshToken = tokens['refreshToken'] ?? '';
+          print('Login Request: ${loginRequest.toJson()}'); // Debug log
 
-        print("Extracted tokens:"); // DEBUG
-        print("Access Token: $accessToken"); // DEBUG
-        print("Refresh Token: $refreshToken"); // DEBUG
+          final loginApi = LoginApi(
+            _apiService.dio,
+            baseUrl: ApiService.baseUrl,
+          );
 
-        await TokenStorage.saveTokens(accessToken, refreshToken);
+          final loginResponse = await loginApi.login(loginRequest);
+          print('Login Response Object: $loginResponse'); // Debug log
 
-        final user = data['user'] ?? {};
-        final userId = user['userId'] ?? '';
-        emit(LoginSuccess(userId: userId));
-      }
-      // if (response.statusCode == 200) {
-      //   final data = response.data['data'];
-      //   final user = data['user'];
-      //   final tokens = data['tokens'];
-      //   final accessToken = tokens['accessToken'] ?? '';
-      //   final refreshToken = tokens['refreshToken'] ?? '';
-      //   final userId = user['userId'] ?? '';
-      //   await TokenStorage.saveTokens(accessToken, refreshToken);
-      //   emit(LoginSuccess(userId: userId));
-      // }
-      else {
-        emit(const LoginFailure(loginError: "Incorrect Account or Password"));
-      }
-    } on DioException catch (e) {
-      String message = "Error connecting to Server";
-      if (e.response != null && e.response?.data != null) {
-        message = e.response?.data["message"] ?? message;
-      }
-      emit(LoginFailure(loginError: message));
-    } catch (e) {
-      emit(const LoginFailure(loginError: "Undefined Error"));
-    }
+          // Validate tokens before saving
+          if (loginResponse.accessToken.isEmpty ||
+              loginResponse.refreshToken.isEmpty) {
+            throw Exception('Invalid token data received from server');
+          }
+
+          // Print tokens for debugging
+          print('Retrieved Access Token: ${loginResponse.accessToken}');
+          print('Retrieved Refresh Token: ${loginResponse.refreshToken}');
+
+          await TokenStorage.saveTokens(
+            loginResponse.accessToken,
+            loginResponse.refreshToken,
+          );
+
+          if (loginResponse.userId.isEmpty) {
+            print('Warning: Empty userId in response');
+          }
+
+          emit(LoginState.success(userId: loginResponse.userId));
+        } on DioException catch (e) {
+          print('DioException: $e'); // Debug log
+          print('DioError Type: ${e.type}');
+          print('DioError Response: ${e.response?.data}'); // Debug log
+          print('DioError Status Code: ${e.response?.statusCode}');
+
+          String errorMessage;
+          if (e.type == DioExceptionType.connectionTimeout ||
+              e.type == DioExceptionType.receiveTimeout ||
+              e.type == DioExceptionType.sendTimeout) {
+            errorMessage =
+                'Connection timeout. Please check your internet connection.';
+          } else if (e.response != null) {
+            // Get error message from server response
+            final responseData = e.response?.data;
+            if (responseData is Map<String, dynamic>) {
+              errorMessage =
+                  responseData['message'] as String? ??
+                  responseData['error'] as String? ??
+                  'Server error: ${e.response?.statusCode}';
+            } else {
+              errorMessage = 'Unexpected server response format';
+            }
+          } else {
+            print('Connection Error Type: ${e.type}');
+            print('Connection Error Message: ${e.message}');
+            print('Connection Error: ${e.error}');
+            
+            switch (e.type) {
+              case DioExceptionType.connectionError:
+                errorMessage = 'Could not connect to the server. Please check your internet connection and try again.';
+                break;
+              case DioExceptionType.badResponse:
+                errorMessage = 'Server returned an invalid response. Please try again later.';
+                break;
+              case DioExceptionType.badCertificate:
+                errorMessage = 'Security certificate issue. Please check your connection security.';
+                break;
+              default:
+                errorMessage = 'Network error: ${e.message}. Please check your connection and try again.';
+            }
+          }
+
+          emit(LoginState.failure(loginError: errorMessage));
+        } catch (e, stackTrace) {
+          print('Error during login: $e'); // Debug log
+          print('Stack trace: $stackTrace'); // Debug log
+          emit(
+            LoginState.failure(
+              loginError: 'An unexpected error occurred. Please try again.',
+            ),
+          );
+        }
+      },
+    );
   }
 }
